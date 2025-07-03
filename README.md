@@ -24,6 +24,20 @@
     *   [Chart.js](https://www.chartjs.org/) (用于趋势图和PRPD图)
     *   [Plotly.js](https://plotly.com/javascript/) (用于PRPS三维图和频谱图)
 
+## 数据流
+
+当前Demo的数据流如下：
+
+1.  **前端 (HTML/CSS/JavaScript)**：
+    *   前端页面 (`index.html` 中的 `script.js`) 通过 JavaScript 的 `fetch` API 向后端 FastAPI 服务发送 HTTP 请求。
+    *   请求的API地址为 `http://127.0.0.1:5000/api/devices` (获取所有设备数据) 或 `http://127.0.0.1:5000/api/devices/{device_id}` (获取特定设备详情)。
+    *   前端接收到后端返回的 JSON 数据后，更新页面上的Dashboard、设备列表和各种图表。
+
+2.  **后端 (Python FastAPI)**：
+    *   后端服务 (`backend/main.py`) 使用 FastAPI 框架。
+    *   它的数据源是项目根目录下的 `backend/data.json` 文件，该文件存储了GIS设备的初始数据。
+    *   **模拟实时更新**：每次前端请求数据时，后端都会对从 `data.json` 读取的数据进行实时的模拟更新（例如，随机波动局放值、温度等，并模拟局放趋势的滚动，甚至模拟设备状态的变化）。这意味着前端每次获取到的数据都是动态变化的，从而实现了Demo的实时动态效果。
+
 ## 如何查看 Demo
 
 您可以直接通过 GitHub Pages 访问此 Demo：
@@ -36,11 +50,11 @@
 
 1.  **克隆仓库**：
     ```bash
-    git clone https://github.com/yangyuqing15715165798/gis-monitoring-demo.git
+    git clone https://github.com/yangyuqing15715165798/gis-monitoring-front-backend-.git
     ```
 2.  **进入项目目录**：
     ```bash
-    cd gis-monitoring-demo
+    cd gis-monitoring-front-backend-
     ```
 3.  **安装后端依赖** (如果尚未安装)：
     ```bash
