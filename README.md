@@ -14,11 +14,12 @@
     *   **频谱图**：展示局放信号的频率分布。
     *   **历史告警记录**：显示设备的告警历史。
     *   **诊断分析结果**：模拟给出设备的诊断结论和风险评估。
-*   **实时数据更新**：模拟数据每隔3秒自动更新，趋势图平滑滚动，设备状态和局放模式可能动态变化。
+*   **实时数据更新**：数据每隔3秒从后端API获取并更新，趋势图平滑滚动，设备状态和局放模式可能动态变化。
 
 ## 技术栈
 
 *   **前端**：HTML, CSS, JavaScript
+*   **后端**：Python FastAPI (使用 `data.json` 模拟数据库)
 *   **图表库**：
     *   [Chart.js](https://www.chartjs.org/) (用于趋势图和PRPD图)
     *   [Plotly.js](https://plotly.com/javascript/) (用于PRPS三维图和频谱图)
@@ -41,13 +42,27 @@
     ```bash
     cd gis-monitoring-demo
     ```
-3.  **打开 `index.html`**：
-    直接在浏览器中打开 `index.html` 文件即可。
-    或者，您可以使用Python启动一个简单的HTTP服务器：
+3.  **安装后端依赖** (如果尚未安装)：
+    ```bash
+    pip install fastapi uvicorn
+    ```
+4.  **启动后端服务**：
+    打开一个命令行窗口，进入 `backend` 目录，并运行：
+    ```bash
+    cd backend
+    uvicorn main:app --reload --host 127.0.0.1 --port 5000
+    ```
+    后端服务将在 `http://127.0.0.1:5000` 运行。
+
+5.  **启动前端HTTP服务器**：
+    打开另一个命令行窗口，进入项目根目录 (即 `index.html` 所在的目录)，并运行：
     ```bash
     python -m http.server 8000
     ```
-    然后在浏览器中访问 `http://localhost:8000`。
+    前端服务将在 `http://localhost:8000` 运行。
+
+6.  **在浏览器中访问 Demo**：
+    在浏览器中打开 `http://localhost:8000/`。
 
 ## 贡献
 
