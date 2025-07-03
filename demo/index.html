@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIS局放在线监测系统 Demo</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>GIS局放在线监测系统 Demo</h1>
+    </header>
+    <main>
+        <section id="dashboard">
+            <h2>实时数据概览</h2>
+            <div class="card-container">
+                <div class="card">
+                    <h3>设备总数</h3>
+                    <p id="total-devices">--</p>
+                </div>
+                <div class="card">
+                    <h3>在线设备</h3>
+                    <p id="online-devices">--</p>
+                </div>
+                <div class="card">
+                    <h3>异常设备</h3>
+                    <p id="abnormal-devices">--</p>
+                </div>
+            </div>
+            <div class="chart-placeholder">
+                <h3>实时局放趋势 (模拟)</h3>
+                <canvas id="pd-trend-chart"></canvas>
+            </div>
+            <div class="latest-alerts">
+                <h3>最新告警</h3>
+                <ul id="alert-list">
+                    <li>暂无告警</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="device-list">
+            <h2>设备列表</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>设备名称</th>
+                        <th>位置</th>
+                        <th>状态</th>
+                        <th>最新局放值 (pC)</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="device-table-body">
+                    <tr>
+                        <td colspan="5">加载中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 设备详情页内容将通过JavaScript动态加载或切换显示 -->
+        <section id="device-detail" style="display: none;">
+            <h2>设备详情：<span id="detail-device-name"></span></h2>
+            <button onclick="showSection('dashboard')">返回概览</button>
+            <div class="detail-info">
+                <h3>基本信息</h3>
+                <p>型号: <span id="detail-model"></span></p>
+                <p>安装位置: <span id="detail-location"></span></p>
+                <p>投运日期: <span id="detail-commission-date"></span></p>
+                <p>温度: <span id="detail-temperature"></span></p>
+                <p>湿度: <span id="detail-humidity"></span></p>
+                <p>SF6气体压力: <span id="detail-sf6-pressure"></span></p>
+            </div>
+            <div class="chart-placeholder">
+                <h3>局放幅值趋势 (模拟)</h3>
+                <canvas id="detail-pd-chart"></canvas>
+            </div>
+            <div class="chart-placeholder">
+                <h3>PRPD 图谱 (模拟)</h3>
+                <canvas id="prpd-chart"></canvas>
+            </div>
+            <div class="chart-placeholder">
+                <h3>PRPS 三维图 (模拟)</h3>
+                <div id="prps-3d-chart" style="height: 400px;"></div>
+            </div>
+            <div class="chart-placeholder">
+                <h3>频谱图 (模拟)</h3>
+                <canvas id="spectrum-chart"></canvas>
+            </div>
+            <div class="latest-alerts">
+                <h3>历史告警记录</h3>
+                <ul id="detail-alert-list">
+                    <li>暂无历史告警</li>
+                </ul>
+            </div>
+            <div class="diagnosis-result">
+                <h3>诊断分析结果 (模拟)</h3>
+                <p id="diagnosis-text">暂无诊断结果</p>
+                <p>风险评估: <span id="risk-assessment"></span></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 GIS Monitoring Demo</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js?v=" + new Date().getTime()></script>
+</body>
+</html>
