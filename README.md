@@ -83,3 +83,47 @@
     *   **实际系统：** 通常需要与电力公司的其他系统（如SCADA系统、资产管理系统、故障诊断系统等）进行集成，实现数据共享和业务协同。
 
 简而言之，我们的Demo是一个很好的概念验证和功能展示，但实际系统是一个复杂的、多学科交叉的工程项目，涉及传感器技术、通信技术、大数据处理、人工智能、工业控制和网络安全等多个领域。
+
+## 如何查看 Demo
+
+您可以直接通过 GitHub Pages 访问此 Demo：
+
+[https://yangyuqing15715165798.github.io/gis-monitoring-demo/](https://yangyuqing15715165798.github.io/gis-monitoring-demo/)
+
+## 本地运行
+
+如果您想在本地运行此Demo，请按照以下步骤操作：
+
+1.  **克隆仓库**：
+    ```bash
+    git clone https://github.com/yangyuqing15715165798/gis-monitoring-front-backend-.git
+    ```
+2.  **进入项目目录**：
+    ```bash
+    cd gis-monitoring-front-backend-
+    ```
+3.  **安装后端依赖** (如果尚未安装)：
+    ```bash
+    pip install fastapi uvicorn
+    ```
+4.  **启动后端服务**：
+    打开一个命令行窗口，进入 `backend` 目录，并运行：
+    ```bash
+    cd backend
+    uvicorn main:app --reload --host 127.0.0.1 --port 5000
+    ```
+    后端服务将在 `http://127.0.0.1:5000` 运行。
+
+5.  **启动前端HTTP服务器**：
+    打开另一个命令行窗口，进入项目根目录 (即 `index.html` 所在的目录)，并运行：
+    ```bash
+    python -m http.server 8000
+    ```
+    前端服务将在 `http://localhost:8000` 运行。
+
+6.  **在浏览器中访问 Demo**：
+    在浏览器中打开 `http://localhost:8000/`。
+
+## 贡献
+
+欢迎提出建议或贡献！
