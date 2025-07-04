@@ -41,11 +41,15 @@ categories = ['corona', 'particle', 'floating', 'surface','void'] # 局放类型
 pd_recognition_system_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'pd_recognition_system')
 model_dir = os.path.join(pd_recognition_system_dir, 'svm_pd_model')
 
-# 在应用启动时加载模型和预处理器
+# 定义保存图像的目录
+TMP_IMAGES_DIR = os.path.join(os.path.dirname(__file__), 'tmp_images')
+
+# 在应用启动时加载模型和预处理器，并创建tmp_images目录
 @app.on_event("startup")
-async def load_models():
+async def load_models_and_create_dirs():
     global clf, scaler, pca
     try:
+        print(f"FastAPI进程当前工作目录: {os.getcwd()}") # 调试信息
         model_path = os.path.join(model_dir, "svm_model.pkl")
         scaler_path = os.path.join(model_dir, "svm_scaler.pkl")
         pca_path = os.path.join(model_dir, "svm_pca.pkl")
@@ -57,9 +61,14 @@ async def load_models():
         print(f"正在加载PCA: {pca_path}")
         pca = joblib.load(pca_path)
         print("所有模型文件加载成功")
+
+        # 创建tmp_images目录
+        os.makedirs(TMP_IMAGES_DIR, exist_ok=True)
+        print(f"已创建或确认目录: {TMP_IMAGES_DIR}")
+
     except Exception as e:
-        print(f"加载模型文件时出错: {str(e)}")
-        raise RuntimeError(f"Failed to load machine learning models: {e}")
+        print(f"加载模型文件或创建目录时出错: {str(e)}")
+        raise RuntimeError(f"Failed to load machine learning models or create directories: {e}")
 
 def load_device_data():
     """从data.json加载设备数据"""
@@ -93,6 +102,7 @@ def prpd_data_to_image(prpd_data_points, image_size=(64, 64), max_amplitude=200)
         # 增加该像素点的强度（模拟脉冲密度）
         image[py, px] = min(255, image[py, px] + 50) # 简单累加，防止溢出
 
+    print(f"PRPD图像数据 - shape: {image.shape}, dtype: {image.dtype}, min: {image.min()}, max: {image.max()}") # 调试信息
     return image
 
 def predict_pd_type(prpd_data_points):
@@ -104,6 +114,29 @@ def predict_pd_type(prpd_data_points):
         raise RuntimeError("Machine learning models are not loaded.")
 
     prpd_image = prpd_data_to_image(prpd_data_points)
+
+    # --- 保存PRPD图像 ---
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3] # 年月日时分秒毫秒
+    image_filename = f"prpd_image_{timestamp}.jpg"
+    image_path = os.path.join(TMP_IMAGES_DIR, image_filename)
+    
+    # 使用cv2.imencode和open()来保存，以支持中文路径
+    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90] # JPEG质量
+    is_success, buffer = cv2.imencode(".jpg", prpd_image, encode_param)
+    if is_success:
+        try:
+            with open(image_path, "wb") as f:
+                f.write(buffer.tobytes())
+            write_success = True
+        except Exception as e:
+            print(f"写入PRPD图像文件失败: {e}")
+            write_success = False
+    else:
+        write_success = False
+    print(f"尝试保存PRPD图像到: {image_path}")
+    print(f"cv2.imwrite (imencode+open) 结果: {write_success}")
+    # --- 保存PRPD图像结束 ---
+
     flattened_image = prpd_image.flatten()
     processed_image = scaler.transform([flattened_image])
     processed_image = pca.transform(processed_image)
@@ -111,9 +144,8 @@ def predict_pd_type(prpd_data_points):
     new_pred = clf.predict(processed_image)
     predicted_category = categories[new_pred[0]]
 
-    # 获取预测概率
     pred_prob = clf.predict_proba(processed_image)
-    predicted_probability = pred_prob[0][new_pred[0]] * 100 # 转换为百分比
+    predicted_probability = pred_prob[0][new_pred[0]] * 100
 
     return {"category": predicted_category, "probability": predicted_probability}
 
@@ -160,7 +192,6 @@ def update_simulated_data(devices_list):
             device['prpsType'] = 'normal'
 
         # 模拟告警触发 (简单示例，可根据实际需求复杂化)
-        # 告警和诊断信息可以根据 predicted_type 和 predictedProbability 来生成
         if device['prpdType'] != 'normal' and device['predictedProbability'] > 60 and (os.urandom(1)[0] / 255) < 0.1: # 如果预测不是正常，且置信度>60%，有10%概率触发告警
             if not device['alerts'] or device['alerts'][0]['type'] != f"局放类型异常: {device['prpdType']}":
                 now = datetime.datetime.now()
