@@ -13,13 +13,15 @@
     *   **PRPS 三维图**：相位分辨脉冲序列三维图，提供更全面的局放特征信息（X轴：相位，Y轴：周期，Z轴：脉冲次数）。
     *   **频谱图**：展示局放信号的频率分布。
     *   **历史告警记录**：显示设备的告警历史。
-    *   **诊断分析结果**：模拟给出设备的诊断结论和风险评估。
+    *   **诊断分析结果**：模拟给出设备的诊断结论和风险评估，**并显示预测的局放类型和置信度**。
 *   **实时数据更新**：数据每隔3秒从后端API获取并更新，趋势图平滑滚动，设备状态和局放模式可能动态变化。
+*   **局放类型智能识别**：后端集成基于SVM的机器学习算法，根据PRPD数据自动识别局放类型。
 
 ## 技术栈
 
 *   **前端**：HTML, CSS, JavaScript
 *   **后端**：Python FastAPI (使用 `data.json` 模拟数据库)
+*   **局放识别算法**：Python (SVM, scikit-learn, OpenCV, joblib)
 *   **图表库**：
     *   [Chart.js](https://www.chartjs.org/) (用于趋势图和PRPD图)
     *   [Plotly.js](https://plotly.com/javascript/) (用于PRPS三维图和频谱图)
@@ -37,12 +39,7 @@
     *   后端服务 (`backend/main.py`) 使用 FastAPI 框架。
     *   它的数据源是项目根目录下的 `backend/data.json` 文件，该文件存储了GIS设备的初始数据。
     *   **模拟实时更新**：每次前端请求数据时，后端都会对从 `data.json` 读取的数据进行实时的模拟更新（例如，随机波动局放值、温度等，并模拟局放趋势的滚动，甚至模拟设备状态的变化）。这意味着前端每次获取到的数据都是动态变化的，从而实现了Demo的实时动态效果。
-
-    总结来说：
-  前端从 FastAPI 后端 获取数据，而 FastAPI 后端的数据源是 `backend/data.json`
-  文件，并且后端在每次提供数据时都会对其进行模拟的实时更新。
-  这种架构模拟了真实世界中前端从API获取动态数据的场景。未来，data.json
-  可以很容易地被替换为真实的数据库（如SQLite、PostgreSQL等），而前端代码几乎不需要改动。
+    *   **局放类型识别**：后端在返回设备数据前，会根据模拟的PRPD数据（从 `pdTrend` 派生）调用集成的SVM模型进行局放类型预测，并将预测结果（类型和置信度）添加到设备数据中。
 
 ## 与实际系统的差距及未来展望
 
@@ -102,15 +99,15 @@
 
 1.  **克隆仓库**：
     ```bash
-    git clone https://github.com/yangyuqing15715165798/gis-monitoring-front-backend-.git
+    git clone https://github.com/yangyuqing15715165798/gis-monitoring-front-backend-svm.git
     ```
 2.  **进入项目目录**：
     ```bash
-    cd gis-monitoring-front-backend-
+    cd gis-monitoring-front-backend-svm
     ```
 3.  **安装后端依赖** (如果尚未安装)：
     ```bash
-    pip install fastapi uvicorn
+    pip install fastapi uvicorn numpy opencv-python scikit-learn joblib
     ```
 4.  **启动后端服务**：
     打开一个命令行窗口，进入 `backend` 目录，并运行：
